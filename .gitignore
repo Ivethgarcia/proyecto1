@@ -1,0 +1,17 @@
+# Sistema de Tabla de Posiciones de Fútbol - .gitignore
+
+# Variables de entorno y credenciales
+.env
+.env.local
+.env.*.local
+
+# Dependencias (si se usan a futuro)
+node_modules/
+package-lock.json
+
+# Archivos de editores y sistemas operativos
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
