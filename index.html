@@ -3,30 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tabla de Posiciones | Torneo de Fútbol</title>
+  <title>Tabla de Posiciones | Liga Élite de Fútbol</title>
+
+  <!-- Google Fonts: Poppins -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Bootstrap Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="css/estilos.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
   <!-- Barra de navegación -->
-  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-3">
+  <nav class="navbar navbar-expand-lg navbar-dark navbar-custom py-3 sticky-top">
     <div class="container">
       <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
         <i class="bi bi-trophy-fill text-warning fs-4"></i>
-        <span>Torneo de Fútbol</span>
+        <span>Liga Élite de Fútbol</span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegación">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto gap-lg-1">
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="index.html">
               <i class="bi bi-table me-1"></i> Posiciones
@@ -47,47 +52,333 @@
     </div>
   </nav>
 
-  <!-- Contenido principal -->
-  <main class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-      <div>
-        <h1 class="h2 mb-1 fw-bold text-dark">
-          <i class="bi bi-bar-chart-line text-primary me-2"></i>Tabla de Posiciones
-        </h1>
-        <p class="text-muted mb-0">Clasificación oficial y estadísticas generales del torneo.</p>
-      </div>
-    </div>
+  <!-- Contenedor principal -->
+  <main class="container my-4 my-md-5">
 
-    <!-- Tarjeta de la Tabla -->
-    <div class="card card-custom p-3 p-md-4">
+    <!-- Encabezado de la Liga con Logo -->
+    <header class="league-header">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 position-relative z-1">
+        <div class="d-flex align-items-center gap-3">
+          <!-- Logo representativo de la liga en formato SVG -->
+          <div class="league-logo-badge" title="Logo Oficial Liga Élite">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Escudo base -->
+              <path d="M32 4L10 12V28C10 44 32 58 32 58C32 58 54 44 54 28V12L32 4Z" fill="#1E3A8A"/>
+              <path d="M32 8L14 14.5V28C14 41.5 32 53.5 32 53.5C32 53.5 50 41.5 50 28V14.5L32 8Z" fill="#2563EB"/>
+              <!-- Balón central -->
+              <circle cx="32" cy="28" r="12" fill="#FFFFFF"/>
+              <polygon points="32,20 36,24 34,29 30,29 28,24" fill="#0F172A"/>
+              <line x1="32" y1="20" x2="32" y2="16" stroke="#0F172A" stroke-width="1.8"/>
+              <line x1="36" y1="24" x2="40" y2="23" stroke="#0F172A" stroke-width="1.8"/>
+              <line x1="34" y1="29" x2="37" y2="33" stroke="#0F172A" stroke-width="1.8"/>
+              <line x1="30" y1="29" x2="27" y2="33" stroke="#0F172A" stroke-width="1.8"/>
+              <line x1="28" y1="24" x2="24" y2="23" stroke="#0F172A" stroke-width="1.8"/>
+              <!-- Estrella de campeonato -->
+              <path d="M32 41L33.8 45H38L34.6 47.4L35.9 51.5L32 49L28.1 51.5L29.4 47.4L26 45H30.2L32 41Z" fill="#F59E0B"/>
+            </svg>
+          </div>
+          <div>
+            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+              <h1 class="league-title m-0">Liga Élite de Fútbol</h1>
+              <span class="badge-season">
+                <i class="bi bi-calendar3 me-1"></i> Temporada 2026
+              </span>
+            </div>
+            <p class="league-subtitle m-0">
+              <i class="bi bi-award me-1"></i> Torneo Oficial • Tabla General de Clasificación
+            </p>
+          </div>
+        </div>
+
+        <div class="d-none d-md-block text-md-end">
+          <div class="small text-white-50 text-uppercase fw-semibold">Jornada Actual</div>
+          <div class="fs-4 fw-bold text-warning">Jornada 10 de 18</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Barra de resumen rápido de métricas -->
+    <section class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="stat-pill-card">
+          <div class="stat-icon-wrapper bg-primary-subtle text-primary">
+            <i class="bi bi-shield-shaded"></i>
+          </div>
+          <div>
+            <div class="text-muted small fw-semibold">Equipos</div>
+            <div class="fs-5 fw-bold text-dark">8 Clubes</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-pill-card">
+          <div class="stat-icon-wrapper bg-success-subtle text-success">
+            <i class="bi bi-trophy"></i>
+          </div>
+          <div>
+            <div class="text-muted small fw-semibold">Líder Actual</div>
+            <div class="fs-6 fw-bold text-dark text-truncate" style="max-width: 130px;">Real Madrid</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-pill-card">
+          <div class="stat-icon-wrapper bg-warning-subtle text-warning">
+            <i class="bi bi-fire"></i>
+          </div>
+          <div>
+            <div class="text-muted small fw-semibold">Partidos</div>
+            <div class="fs-5 fw-bold text-dark">40 Jugados</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="stat-pill-card">
+          <div class="stat-icon-wrapper bg-info-subtle text-info">
+            <i class="bi bi-bullseye"></i>
+          </div>
+          <div>
+            <div class="text-muted small fw-semibold">Goles Totales</div>
+            <div class="fs-5 fw-bold text-dark">119 Goles</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tarjeta Principal con la Tabla de Posiciones -->
+    <div class="standings-card">
+      <div class="standings-card-header">
+        <h2 class="standings-card-title">
+          <i class="bi bi-list-ol text-primary"></i> Tabla General
+        </h2>
+        <span class="badge bg-light text-secondary border px-3 py-2">
+          <i class="bi bi-arrow-repeat me-1"></i> Actualizado en vivo
+        </span>
+      </div>
+
+      <!-- Contenedor con scroll responsivo -->
       <div class="table-responsive">
-        <table class="table table-hover table-posiciones align-middle mb-0">
+        <table class="table table-standings align-middle">
           <thead>
             <tr>
-              <th scope="col" style="width: 60px;">#</th>
-              <th scope="col" class="text-start">Equipo</th>
+              <th scope="col" style="width: 55px;">Pos</th>
+              <th scope="col" class="col-team">Equipo</th>
               <th scope="col" title="Partidos Jugados">PJ</th>
-              <th scope="col" title="Partidos Ganados">G</th>
-              <th scope="col" title="Partidos Empatados">E</th>
-              <th scope="col" title="Partidos Perdidos">P</th>
+              <th scope="col" title="Partidos Ganados">PG</th>
+              <th scope="col" title="Partidos Empatados">PE</th>
+              <th scope="col" title="Partidos Perdidos">PP</th>
               <th scope="col" title="Goles a Favor">GF</th>
               <th scope="col" title="Goles en Contra">GC</th>
               <th scope="col" title="Diferencia de Goles">DG</th>
-              <th scope="col" class="fw-bold" title="Puntos Totales">PTS</th>
+              <th scope="col" class="col-points" title="Puntos Totales">PTS</th>
             </tr>
           </thead>
           <tbody id="tabla-posiciones-body">
-            <!-- Filas generadas dinámicamente mediante js/posiciones.js -->
+
+            <!-- Fila 1: Zona de Clasificación (Líder / Campeón) -->
+            <tr class="row-champions">
+              <td>
+                <span class="pos-badge pos-gold" title="Líder del Torneo">1</span>
+              </td>
+              <td class="col-team">
+                <div class="team-item">
+                  <div class="team-shield">⚪</div>
+                  <span class="team-name">Real Madrid</span>
+                </div>
+              </td>
+              <td>10</td>
+              <td>8</td>
+              <td>1</td>
+              <td>1</td>
+              <td>24</td>
+              <td>8</td>
+              <td class="dg-positive">+16</td>
+              <td class="col-points">25</td>
+            </tr>
+
+            <!-- Fila 2: Zona de Clasificación -->
+            <tr class="row-champions">
+              <td>
+                <span class="pos-badge pos-champions">2</span>
+              </td>
+              <td class="col-team">
+                <div class="team-item">
+                  <div class="team-shield">🔵</div>
+                  <span class="team-name">FC Barcelona</span>
+                </div>
+              </td>
+              <td>10</td>
+              <td>7</td>
+              <td>2</td>
+              <td>1</td>
+              <td>22</td>
+              <td>10</td>
+              <td class="dg-positive">+12</td>
+              <td class="col-points">23</td>
+            </tr>
+
+            <!-- Fila 3: Zona de Clasificación -->
+            <tr class="row-champions">
+              <td>
+                <span class="pos-badge pos-champions">3</span>
+              </td>
+              <td class="col-team">
+                <div class="team-item">
+                  <div class="team-shield">🔴</div>
+                  <span class="team-name">Atlético de Madrid</span>
+                </div>
+              </td>
+              <td>10</td>
+              <td>6</td>
+              <td>2</td>
+              <td>2</td>
+              <td>18</td>
+              <td>9</td>
+              <td class="dg-positive">+9</td>
+              <td class="col-points">20</td>
+            </tr>
+
+            <!-- Fila 4: Zona de Clasificación -->
+            <tr class="row-champions">
+              <td>
+                <span class="pos-badge pos-champions">4</span>
+              </td>
+              <td class="col-team">
+                <div class="team-item">
+                  <div class="team-shield">🦁</div>
+                  <span class="team-name">Athletic Club</span>
+                </div>
+              </td>
+              <td>10</td>
+              <td>5</td>
+              <td>3</td>
+              <td>2</td>
+              <td>15</td>
+              <td>11</td>
+              <td class="dg-positive">+4</td>
+              <td class="col-points">18</td>
+            </tr>
+
+            <!-- Fila 5: Zona Media (Neutral) -->
+            <tr class="row-neutral">
+              <td>
+                <span class="pos-badge pos-regular">5</span>
+              </td>
+              <td class="col-team">
+                <div class="team-item">
+                  <div class="team-shield">🟢</div>
+                  <span class="team-name">Real Betis</span>
+                </div>
+              </td>
+              <td>10</td>
+              <td>4</td>
+              <td>3</td>
+              <td>3</td>
+              <td>14</td>
+              <td>13</td>
+              <td class="dg-positive">+1</td>
+              <td class="col-points">15</td>
+            </tr>
+
+            <!-- Fila 6: Zona Media (Neutral) -->
+            <tr class="row-neutral">
+              <td>
+                <span class="pos-badge pos-regular">6</span>
+              </td>
+              <td class="col-team">
+                <div class="team-item">
+                  <div class="team-shield">⚪</div>
+                  <span class="team-name">Sevilla FC</span>
+                </div>
+              </td>
+              <td>10</td>
+              <td>3</td>
+              <td>3</td>
+              <td>4</td>
+              <td>12</td>
+              <td>15</td>
+              <td class="dg-negative">-3</td>
+              <td class="col-points">12</td>
+            </tr>
+
+            <!-- Fila 7: Zona de Descenso (Rojo) -->
+            <tr class="row-relegation">
+              <td>
+                <span class="pos-badge pos-relegation">7</span>
+              </td>
+              <td class="col-team">
+                <div class="team-item">
+                  <div class="team-shield">🦇</div>
+                  <span class="team-name">Valencia CF</span>
+                </div>
+              </td>
+              <td>10</td>
+              <td>1</td>
+              <td>3</td>
+              <td>6</td>
+              <td>8</td>
+              <td>19</td>
+              <td class="dg-negative">-11</td>
+              <td class="col-points">6</td>
+            </tr>
+
+            <!-- Fila 8: Zona de Descenso (Rojo) -->
+            <tr class="row-relegation">
+              <td>
+                <span class="pos-badge pos-relegation">8</span>
+              </td>
+              <td class="col-team">
+                <div class="team-item">
+                  <div class="team-shield">🔴</div>
+                  <span class="team-name">UD Almería</span>
+                </div>
+              </td>
+              <td>10</td>
+              <td>0</td>
+              <td>3</td>
+              <td>7</td>
+              <td>6</td>
+              <td>23</td>
+              <td class="dg-negative">-17</td>
+              <td class="col-points">3</td>
+            </tr>
+
           </tbody>
         </table>
       </div>
     </div>
+
+    <!-- Leyenda de colores de distinción -->
+    <div class="legend-card">
+      <div class="d-flex align-items-center justify-content-start flex-wrap gap-4">
+        <div class="fw-bold small text-muted text-uppercase">
+          <i class="bi bi-info-circle me-1"></i> Referencias:
+        </div>
+        <div class="legend-item">
+          <span class="legend-color-indicator indicator-champions"></span>
+          <span>Zona de Clasificación a Torneo Internacional (1º - 4º)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color-indicator indicator-neutral"></span>
+          <span>Zona Media de Tabla (Permanencia)</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-color-indicator indicator-relegation"></span>
+          <span>Zona de Descenso (7º - 8º)</span>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Pie de página -->
-  <footer class="py-3 text-center">
+  <footer class="py-4 text-center mt-5">
     <div class="container">
-      <small>&copy; 2026 Sistema de Tabla de Posiciones de Fútbol. Desarrollado paso a paso.</small>
+      <div class="d-flex align-items-center justify-content-center gap-2 mb-2">
+        <i class="bi bi-trophy-fill text-warning"></i>
+        <span class="fw-semibold text-white">Sistema de Tabla de Posiciones de Fútbol</span>
+      </div>
+      <p class="small text-muted mb-0">&copy; 2026 Liga Élite de Fútbol. Todos los derechos reservados.</p>
     </div>
   </footer>
 
