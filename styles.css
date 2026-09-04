@@ -1,0 +1,512 @@
+/* ===================================================
+   Sistema de Tabla de Posiciones de Liga de Fútbol
+   Archivo: styles.css
+   Diseño Limpio, Moderno y 100% Responsivo
+   =================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Paleta de colores principal */
+  --primary: #0f172a;           /* Azul noche profundo */
+  --primary-light: #1e293b;     /* Azul pizarra */
+  --accent-blue: #2563eb;       /* Azul deportivo */
+  --accent-gold: #f59e0b;       /* Dorado trofeo */
+  
+  /* Zonas de clasificación y descenso */
+  --zone-champions-bg: rgba(16, 185, 129, 0.08);
+  --zone-champions-border: #10b981; /* Verde esmeralda */
+  --zone-champions-badge: #059669;
+  
+  --zone-relegation-bg: rgba(239, 68, 68, 0.08);
+  --zone-relegation-border: #ef4444; /* Rojo carmesí */
+  --zone-relegation-badge: #dc2626;
+
+  /* Colores de interfaz */
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-light: #e2e8f0;
+  --hover-row: #f1f5f9;
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 25px -4px rgba(15, 23, 42, 0.08), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===================================================
+   Barra de Navegación
+   =================================================== */
+.navbar-custom {
+  background: linear-gradient(135deg, #090d16 0%, #1e293b 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.3px;
+  color: #ffffff !important;
+}
+
+.navbar-custom .nav-link {
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #cbd5e1 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.navbar-custom .nav-link:hover {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.navbar-custom .nav-link.active {
+  color: #ffffff !important;
+  background-color: var(--accent-blue);
+  font-weight: 600;
+}
+
+/* ===================================================
+   Encabezado Hero / Header de la Liga
+   =================================================== */
+.league-header {
+  background: linear-gradient(145deg, #0f172a 0%, #1e3a8a 60%, #0369a1 100%);
+  color: #ffffff;
+  padding: 2.5rem 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.league-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 320px;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.league-logo-badge {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffffff 0%, #e2e8f0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  border: 3px solid rgba(255, 255, 255, 0.9);
+  flex-shrink: 0;
+}
+
+.league-logo-badge svg {
+  width: 44px;
+  height: 44px;
+}
+
+.league-title {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+  margin-bottom: 0.25rem;
+}
+
+.league-subtitle {
+  font-size: 0.95rem;
+  color: #93c5fd;
+  font-weight: 400;
+}
+
+.badge-season {
+  background-color: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* ===================================================
+   Tarjetas de Resumen Rápido (Stats Bar)
+   =================================================== */
+.stat-pill-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-pill-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-icon-wrapper {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+/* ===================================================
+   Contenedor Principal de la Tabla
+   =================================================== */
+.standings-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.standings-card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.standings-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+/* ===================================================
+   Estilos de la Tabla
+   =================================================== */
+.table-standings {
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table-standings thead {
+  background-color: #0f172a;
+}
+
+.table-standings thead th {
+  color: #f8fafc;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 0.95rem 0.65rem;
+  text-align: center;
+  border: none;
+  white-space: nowrap;
+}
+
+.table-standings thead th.col-team {
+  text-align: left;
+  padding-left: 1.25rem;
+}
+
+.table-standings tbody tr {
+  transition: background-color 0.15s ease, transform 0.15s ease;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.table-standings tbody tr:hover {
+  background-color: var(--hover-row);
+}
+
+.table-standings tbody tr:last-child {
+  border-bottom: none;
+}
+
+.table-standings tbody td {
+  padding: 0.85rem 0.65rem;
+  font-size: 0.92rem;
+  text-align: center;
+  vertical-align: middle;
+  border-top: 1px solid var(--border-light);
+  color: #334155;
+  white-space: nowrap;
+}
+
+.table-standings tbody td.col-team {
+  text-align: left;
+  padding-left: 1.25rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* Columna de Puntos Destacada */
+.table-standings td.col-points {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.table-standings thead th.col-points {
+  background-color: #1e293b;
+  color: #ffffff;
+}
+
+/* Diferencia de Goles */
+.dg-positive {
+  color: #059669;
+  font-weight: 600;
+}
+
+.dg-negative {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.dg-neutral {
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* ===================================================
+   Insignias de Posición y Distinción
+   =================================================== */
+.pos-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Puesto 1 (Líder / Campeón) */
+.pos-gold {
+  background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+}
+
+/* Puestos de Clasificación (Verde) */
+.pos-champions {
+  background-color: var(--zone-champions-badge);
+}
+
+/* Puestos Neutros */
+.pos-regular {
+  background-color: #cbd5e1;
+  color: #334155;
+}
+
+/* Puestos de Descenso (Rojo) */
+.pos-relegation {
+  background-color: var(--zone-relegation-badge);
+}
+
+/* Filas con distinción de color */
+.row-champions {
+  background-color: var(--zone-champions-bg);
+  border-left: 5px solid var(--zone-champions-border) !important;
+}
+
+.row-champions:hover {
+  background-color: rgba(16, 185, 129, 0.13) !important;
+}
+
+.row-relegation {
+  background-color: var(--zone-relegation-bg);
+  border-left: 5px solid var(--zone-relegation-border) !important;
+}
+
+.row-relegation:hover {
+  background-color: rgba(239, 68, 68, 0.13) !important;
+}
+
+.row-neutral {
+  border-left: 5px solid transparent;
+}
+
+/* Logo / Escudo del club */
+.team-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.team-shield {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.team-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+/* ===================================================
+   Leyenda Visual
+   =================================================== */
+.legend-card {
+  background-color: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 1.1rem 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.legend-color-indicator {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.indicator-champions {
+  background-color: var(--zone-champions-border);
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+.indicator-relegation {
+  background-color: var(--zone-relegation-border);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.indicator-neutral {
+  background-color: #94a3b8;
+}
+
+/* ===================================================
+   Pie de página
+   =================================================== */
+footer {
+  margin-top: auto;
+  background-color: #0b1120;
+  color: #94a3b8;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ===================================================
+   Responsive / Adaptabilidad Móvil
+   =================================================== */
+@media (max-width: 768px) {
+  .league-header {
+    padding: 1.75rem 1.25rem;
+    text-align: center;
+  }
+
+  .league-header .d-flex {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .league-title {
+    font-size: 1.6rem;
+  }
+
+  .league-logo-badge {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 0.5rem;
+  }
+
+  .standings-card-header {
+    padding: 1rem;
+  }
+
+  .table-standings thead th {
+    padding: 0.75rem 0.45rem;
+    font-size: 0.72rem;
+  }
+
+  .table-standings tbody td {
+    padding: 0.75rem 0.45rem;
+    font-size: 0.85rem;
+  }
+
+  .team-name {
+    font-size: 0.88rem;
+  }
+
+  .pos-badge {
+    width: 26px;
+    height: 26px;
+    font-size: 0.78rem;
+  }
+}
+
+/* Barra de desplazamiento suave para tabla en móviles */
+.table-responsive::-webkit-scrollbar {
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
