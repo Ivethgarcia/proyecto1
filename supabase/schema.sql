@@ -29,41 +29,41 @@ CREATE TABLE IF NOT EXISTS partidos (
 ALTER TABLE equipos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE partidos ENABLE ROW LEVEL SECURITY;
 
--- 4. Políticas para permitir operaciones desde el cliente web (rol anon)
--- Equipos:
-CREATE POLICY "Permitir lectura pública en equipos" 
+-- 4. Políticas de Seguridad RLS:
+-- VISTA PÚBLICA: Todos pueden leer (anon y authenticated)
+CREATE POLICY "Lectura pública de equipos" 
 ON equipos FOR SELECT TO anon, authenticated USING (true);
 
-CREATE POLICY "Permitir crear equipos" 
-ON equipos FOR INSERT TO anon, authenticated WITH CHECK (true);
-
-CREATE POLICY "Permitir editar equipos" 
-ON equipos FOR UPDATE TO anon, authenticated USING (true);
-
-CREATE POLICY "Permitir eliminar equipos" 
-ON equipos FOR DELETE TO anon, authenticated USING (true);
-
--- Partidos:
-CREATE POLICY "Permitir lectura pública en partidos" 
+CREATE POLICY "Lectura pública de partidos" 
 ON partidos FOR SELECT TO anon, authenticated USING (true);
 
-CREATE POLICY "Permitir crear partidos" 
-ON partidos FOR INSERT TO anon, authenticated WITH CHECK (true);
+-- PANEL DE ADMINISTRADOR: Solo usuarios autenticados pueden crear, editar y eliminar
+CREATE POLICY "Solo administradores crean equipos" 
+ON equipos FOR INSERT TO authenticated WITH CHECK (true);
 
-CREATE POLICY "Permitir editar partidos" 
-ON partidos FOR UPDATE TO anon, authenticated USING (true);
+CREATE POLICY "Solo administradores editan equipos" 
+ON equipos FOR UPDATE TO authenticated USING (true);
 
-CREATE POLICY "Permitir eliminar partidos" 
-ON partidos FOR DELETE TO anon, authenticated USING (true);
+CREATE POLICY "Solo administradores eliminan equipos" 
+ON equipos FOR DELETE TO authenticated USING (true);
 
--- 5. Inserción de Equipos Iniciales (Datos de Ejemplo)
+CREATE POLICY "Solo administradores crean partidos" 
+ON partidos FOR INSERT TO authenticated WITH CHECK (true);
+
+CREATE POLICY "Solo administradores editan partidos" 
+ON partidos FOR UPDATE TO authenticated USING (true);
+
+CREATE POLICY "Solo administradores eliminan partidos" 
+ON partidos FOR DELETE TO authenticated USING (true);
+
+-- 5. Inserción de Equipos Iniciales
 INSERT INTO equipos (nombre, logo_url) VALUES
-('Real Madrid', 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg'),
-('FC Barcelona', 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg'),
-('Atlético de Madrid', 'https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg'),
-('Athletic Club', 'https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg'),
-('Real Betis', 'https://upload.wikimedia.org/wikipedia/en/1/13/Real_betis_logo.svg'),
-('Sevilla FC', 'https://upload.wikimedia.org/wikipedia/en/3/3b/Sevilla_FC_logo.svg'),
-('Valencia CF', 'https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg'),
-('UD Almería', 'https://upload.wikimedia.org/wikipedia/en/3/35/UD_Almeria.svg')
+('Real Madrid', '⚪'),
+('FC Barcelona', '🔵'),
+('Atlético de Madrid', '🔴'),
+('Athletic Club', '🦁'),
+('Real Betis', '🟢'),
+('Sevilla FC', '⚪'),
+('Valencia CF', '🦇'),
+('UD Almería', '🔴')
 ON CONFLICT (nombre) DO NOTHING;

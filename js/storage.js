@@ -89,6 +89,27 @@ class StorageManager {
     return nuevoEquipo;
   }
 
+  updateEquipo(id, { nombre, logo_url }) {
+    const equipos = this.getEquipos();
+    const index = equipos.findIndex(e => String(e.id) === String(id));
+    if (index === -1) {
+      throw new Error('Equipo no encontrado.');
+    }
+
+    const existeOtro = equipos.some(e => String(e.id) !== String(id) && e.nombre.toLowerCase().trim() === nombre.toLowerCase().trim());
+    if (existeOtro) {
+      throw new Error(`Ya existe otro equipo con el nombre "${nombre}".`);
+    }
+
+    equipos[index].nombre = nombre.trim();
+    if (logo_url !== undefined) {
+      equipos[index].logo_url = logo_url.trim() || '🛡️';
+    }
+
+    this.setEquipos(equipos);
+    return equipos[index];
+  }
+
   deleteEquipo(id) {
     let equipos = this.getEquipos();
     equipos = equipos.filter(e => String(e.id) !== String(id));
@@ -113,6 +134,11 @@ class StorageManager {
     localStorage.setItem(STORAGE_KEYS.PARTIDOS, JSON.stringify(partidos));
   }
 
+  getPartidoById(id) {
+    const partidos = this.getPartidos();
+    return partidos.find(p => String(p.id) === String(id));
+  }
+
   addPartido(partido) {
     const partidos = this.getPartidos();
     if (String(partido.local_id) === String(partido.visitante_id)) {
@@ -134,6 +160,33 @@ class StorageManager {
     partidos.push(nuevoPartido);
     this.setPartidos(partidos);
     return nuevoPartido;
+  }
+
+  updatePartido(id, datos) {
+    const partidos = this.getPartidos();
+    const index = partidos.findIndex(p => String(p.id) === String(id));
+    if (index === -1) {
+      throw new Error('Partido no encontrado.');
+    }
+
+    if (datos.local_id && datos.visitante_id && String(datos.local_id) === String(datos.visitante_id)) {
+      throw new Error('El equipo local y visitante no pueden ser el mismo.');
+    }
+
+    const partidoActual = partidos[index];
+    partidos[index] = {
+      ...partidoActual,
+      jornada: datos.jornada !== undefined ? Number(datos.jornada) : partidoActual.jornada,
+      fecha: datos.fecha !== undefined ? datos.fecha : partidoActual.fecha,
+      local_id: datos.local_id !== undefined ? Number(datos.local_id) : partidoActual.local_id,
+      visitante_id: datos.visitante_id !== undefined ? Number(datos.visitante_id) : partidoActual.visitante_id,
+      goles_local: datos.goles_local !== undefined ? Number(datos.goles_local) : partidoActual.goles_local,
+      goles_visitante: datos.goles_visitante !== undefined ? Number(datos.goles_visitante) : partidoActual.goles_visitante,
+      estado: datos.estado !== undefined ? datos.estado : partidoActual.estado
+    };
+
+    this.setPartidos(partidos);
+    return partidos[index];
   }
 
   deletePartido(id) {
