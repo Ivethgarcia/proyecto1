@@ -2,7 +2,8 @@
  * ===================================================
  * Sistema de Tabla de Posiciones de Fútbol
  * Archivo: js/partidos.js
- * Descripción: Gestión administrativa de Partidos y Marcadores (Crear, Actualizar Marcador, Eliminar)
+ * Descripción: Gestión administrativa de Partidos y Marcadores
+ * Incluye asignación interactiva de Goleadores por equipo
  * Compatible con Supabase y LocalStorage
  * ===================================================
  */
@@ -11,8 +12,15 @@ let modalEdicionPartido = null;
 let equiposCache = [];
 let partidosCache = [];
 
+// Variables temporales para el modal de edición
+let jugadoresLocalModal = [];
+let jugadoresVisitanteModal = [];
+let golesActualesModal = [];
+let partidoActivoId = null;
+let equipoLocalActivoId = null;
+let equipoVisitanteActivoId = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
-  // Inicializar instancia de modal de Bootstrap si existe
   const modalEl = document.getElementById('modalEditarPartido');
   if (modalEl && typeof bootstrap !== 'undefined') {
     modalEdicionPartido = new bootstrap.Modal(modalEl);
@@ -22,10 +30,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   await renderizarPartidos();
   configurarFormularioCrearPartido();
   configurarFormularioEditarPartido();
+  configurarListenersMarcadorModal();
 });
 
 /**
- * Llena los selectores de equipo local y visitante
+ * Llena los selectores de equipo local y visitante en el formulario de creación
  */
 async function cargarSelectsEquipos() {
   const selectLocal = document.getElementById('equipo-local');
@@ -73,9 +82,7 @@ async function renderizarPartidos() {
       return;
     }
 
-    // Ordenar por jornada descendente
     const ordenados = [...partidosCache].sort((a, b) => b.jornada - a.jornada);
-
     const getEquipo = (id) => equiposCache.find(e => String(e.id) === String(id)) || { nombre: 'Equipo', logo_url: '🛡️' };
 
     tbody.innerHTML = ordenados.map(p => {
@@ -112,7 +119,7 @@ async function renderizarPartidos() {
           <td class="text-center">${estadoBadge}</td>
           <td class="text-center">
             <div class="btn-group btn-group-sm" role="group">
-              <button class="btn btn-outline-primary" onclick="abrirModalEditarPartido(${p.id})" title="Actualizar marcador">
+              <button class="btn btn-outline-primary" onclick="abrirModalEditarPartido(${p.id})" title="Actualizar marcador y goleadores">
                 <i class="bi bi-pencil-square"></i> Marcador
               </button>
               <button class="btn btn-outline-danger" onclick="eliminarPartido(${p.id})" title="Eliminar partido">
@@ -129,7 +136,7 @@ async function renderizarPartidos() {
 }
 
 /**
- * Configura el formulario para programar un partido
+ * Formulario para crear un nuevo partido
  */
 function configurarFormularioCrearPartido() {
   const form = document.getElementById('form-partido');
@@ -195,21 +202,26 @@ function configurarFormularioCrearPartido() {
 }
 
 /**
- * Abre el modal para editar el marcador y estado de un partido
+ * Abre el modal para editar el marcador y asignar goleadores
  */
-window.abrirModalEditarPartido = function(id) {
+window.abrirModalEditarPartido = async function(id) {
   const partido = partidosCache.find(p => String(p.id) === String(id));
   if (!partido) return;
 
-  const locId = partido.local_id || partido.equipo_local_id;
-  const visId = partido.visitante_id || partido.equipo_visitante_id;
-  const local = equiposCache.find(e => String(e.id) === String(locId)) || { nombre: 'Local' };
-  const visitante = equiposCache.find(e => String(e.id) === String(visId)) || { nombre: 'Visitante' };
+  partidoActivoId = partido.id;
+  equipoLocalActivoId = partido.local_id || partido.equipo_local_id;
+  equipoVisitanteActivoId = partido.visitante_id || partido.equipo_visitante_id;
+
+  const local = equiposCache.find(e => String(e.id) === String(equipoLocalActivoId)) || { nombre: 'Local' };
+  const visitante = equiposCache.find(e => String(e.id) === String(equipoVisitanteActivoId)) || { nombre: 'Visitante' };
 
   document.getElementById('edit-partido-id').value = partido.id;
   document.getElementById('edit-nombre-local').textContent = local.nombre;
   document.getElementById('edit-nombre-visitante').textContent = visitante.nombre;
   document.getElementById('edit-encuentro-info').textContent = `Jornada ${partido.jornada} • Fecha: ${partido.fecha || 'Sin fecha'}`;
+
+  document.getElementById('label-goleadores-local').textContent = `Goles de ${local.nombre}:`;
+  document.getElementById('label-goleadores-visitante').textContent = `Goles de ${visitante.nombre}:`;
 
   document.getElementById('edit-goles-local').value = partido.goles_local || 0;
   document.getElementById('edit-goles-visitante').value = partido.goles_visitante || 0;
@@ -217,13 +229,102 @@ window.abrirModalEditarPartido = function(id) {
   document.getElementById('edit-jornada').value = partido.jornada || 1;
   document.getElementById('edit-fecha').value = partido.fecha || new Date().toISOString().split('T')[0];
 
+  // Cargar jugadores de ambos clubes y los goles registrados para este encuentro
+  try {
+    jugadoresLocalModal = await window.api.jugadores.getAll(equipoLocalActivoId);
+    jugadoresVisitanteModal = await window.api.jugadores.getAll(equipoVisitanteActivoId);
+    golesActualesModal = await window.api.goles.getByPartido(partido.id);
+
+    renderizarCamposGoleadores();
+  } catch (err) {
+    console.error('Error al cargar datos de goleadores para el modal:', err);
+  }
+
   if (modalEdicionPartido) {
     modalEdicionPartido.show();
   }
 };
 
 /**
- * Configura el formulario para guardar la edición del marcador
+ * Escucha cambios en los campos de goles para ajustar dinámicamente los selectores de goleadores
+ */
+function configurarListenersMarcadorModal() {
+  const inputGL = document.getElementById('edit-goles-local');
+  const inputGV = document.getElementById('edit-goles-visitante');
+
+  if (inputGL) inputGL.addEventListener('input', () => renderizarCamposGoleadores());
+  if (inputGV) inputGV.addEventListener('input', () => renderizarCamposGoleadores());
+}
+
+/**
+ * Renderiza los selectores de goleadores según el número de goles de cada equipo
+ */
+function renderizarCamposGoleadores() {
+  const contLocal = document.getElementById('contenedor-goleadores-local');
+  const contVis = document.getElementById('contenedor-goleadores-visitante');
+  const badgeInfo = document.getElementById('badge-total-goles-info');
+  if (!contLocal || !contVis) return;
+
+  const gl = Math.max(0, parseInt(document.getElementById('edit-goles-local').value) || 0);
+  const gv = Math.max(0, parseInt(document.getElementById('edit-goles-visitante').value) || 0);
+
+  if (badgeInfo) {
+    badgeInfo.textContent = `${gl + gv} gol(es) totales`;
+  }
+
+  // Filtrar goles previos que coincidan con cada equipo
+  const golesPreviosLocal = (golesActualesModal || []).filter(g => String(g.equipo_id) === String(equipoLocalActivoId));
+  const golesPreviosVis = (golesActualesModal || []).filter(g => String(g.equipo_id) === String(equipoVisitanteActivoId));
+
+  // Generar campos de goles local
+  if (gl === 0) {
+    contLocal.innerHTML = '<span class="text-muted small">Sin goles para este equipo.</span>';
+  } else {
+    contLocal.innerHTML = Array.from({ length: gl }, (_, i) => {
+      const golPrev = golesPreviosLocal[i];
+      const opciones = jugadoresLocalModal.map(j => 
+        `<option value="${j.id}" ${golPrev && String(golPrev.jugador_id) === String(j.id) ? 'selected' : ''}>#${j.numero} ${j.nombre}</option>`
+      ).join('');
+
+      return `
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light text-muted">⚽ Gol ${i + 1}</span>
+          <select class="form-select selector-gol-local" required>
+            <option value="" ${!golPrev ? 'selected' : ''} disabled>Selecciona anotador...</option>
+            ${opciones}
+          </select>
+          <input type="number" class="form-control minuto-gol-local" placeholder="Min'" min="1" max="120" style="max-width: 65px;" value="${golPrev && golPrev.minuto ? golPrev.minuto : ''}">
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Generar campos de goles visitante
+  if (gv === 0) {
+    contVis.innerHTML = '<span class="text-muted small">Sin goles para este equipo.</span>';
+  } else {
+    contVis.innerHTML = Array.from({ length: gv }, (_, i) => {
+      const golPrev = golesPreviosVis[i];
+      const opciones = jugadoresVisitanteModal.map(j => 
+        `<option value="${j.id}" ${golPrev && String(golPrev.jugador_id) === String(j.id) ? 'selected' : ''}>#${j.numero} ${j.nombre}</option>`
+      ).join('');
+
+      return `
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light text-muted">⚽ Gol ${i + 1}</span>
+          <select class="form-select selector-gol-visitante" required>
+            <option value="" ${!golPrev ? 'selected' : ''} disabled>Selecciona anotador...</option>
+            ${opciones}
+          </select>
+          <input type="number" class="form-control minuto-gol-visitante" placeholder="Min'" min="1" max="120" style="max-width: 65px;" value="${golPrev && golPrev.minuto ? golPrev.minuto : ''}">
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+/**
+ * Formulario para guardar la edición del marcador y los goleadores asignados
  */
 function configurarFormularioEditarPartido() {
   const formEdit = document.getElementById('form-editar-partido');
@@ -234,32 +335,67 @@ function configurarFormularioEditarPartido() {
     e.preventDefault();
 
     const id = document.getElementById('edit-partido-id').value;
-    const goles_local = document.getElementById('edit-goles-local').value;
-    const goles_visitante = document.getElementById('edit-goles-visitante').value;
+    const goles_local = Number(document.getElementById('edit-goles-local').value) || 0;
+    const goles_visitante = Number(document.getElementById('edit-goles-visitante').value) || 0;
     const estado = document.getElementById('edit-estado-partido').value;
     const jornada = document.getElementById('edit-jornada').value;
     const fecha = document.getElementById('edit-fecha').value;
 
+    // Recolectar lista de goleadores seleccionados
+    const listaGoles = [];
+
+    // Goleadores del equipo local
+    const selectsLocal = document.querySelectorAll('.selector-gol-local');
+    const minsLocal = document.querySelectorAll('.minuto-gol-local');
+    selectsLocal.forEach((sel, i) => {
+      if (sel.value) {
+        listaGoles.push({
+          partido_id: Number(id),
+          equipo_id: Number(equipoLocalActivoId),
+          jugador_id: Number(sel.value),
+          minuto: minsLocal[i] && minsLocal[i].value ? Number(minsLocal[i].value) : null
+        });
+      }
+    });
+
+    // Goleadores del equipo visitante
+    const selectsVis = document.querySelectorAll('.selector-gol-visitante');
+    const minsVis = document.querySelectorAll('.minuto-gol-visitante');
+    selectsVis.forEach((sel, i) => {
+      if (sel.value) {
+        listaGoles.push({
+          partido_id: Number(id),
+          equipo_id: Number(equipoVisitanteActivoId),
+          jugador_id: Number(sel.value),
+          minuto: minsVis[i] && minsVis[i].value ? Number(minsVis[i].value) : null
+        });
+      }
+    });
+
     if (btnEdit) {
       btnEdit.disabled = true;
-      btnEdit.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Actualizando...';
+      btnEdit.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Guardando marcador...';
     }
 
     try {
+      // 1. Actualizar el partido
       await window.api.partidos.update(id, {
-        goles_local: Number(goles_local),
-        goles_visitante: Number(goles_visitante),
+        goles_local,
+        goles_visitante,
         estado,
         jornada: Number(jornada),
         fecha
       });
+
+      // 2. Guardar los registros de goles de los futbolistas
+      await window.api.goles.setPartidoGoles(id, listaGoles);
 
       if (modalEdicionPartido) {
         modalEdicionPartido.hide();
       }
       await renderizarPartidos();
     } catch (error) {
-      alert(error.message || 'Error al actualizar el partido.');
+      alert(error.message || 'Error al actualizar el partido y goleadores.');
     } finally {
       if (btnEdit) {
         btnEdit.disabled = false;
@@ -273,7 +409,7 @@ function configurarFormularioEditarPartido() {
  * Elimina un partido con confirmación
  */
 window.eliminarPartido = async function(id) {
-  if (confirm('¿Deseas eliminar este registro de encuentro?')) {
+  if (confirm('¿Deseas eliminar este registro de encuentro? También se eliminarán sus registros de goles asociados.')) {
     try {
       await window.api.partidos.delete(id);
       await renderizarPartidos();

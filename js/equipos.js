@@ -63,8 +63,11 @@ async function renderizarEquipos() {
           <td class="fw-semibold text-dark">${eq.nombre}</td>
           <td class="text-center">
             <div class="btn-group btn-group-sm" role="group">
+              <a href="admin-jugadores.html?equipo=${eq.id}" class="btn btn-outline-info" title="Ver y gestionar plantilla de jugadores">
+                <i class="bi bi-people-fill"></i> Plantilla
+              </a>
               <button class="btn btn-outline-primary" onclick="abrirModalEditarEquipo(${eq.id}, '${escapeHtml(eq.nombre)}', '${escapeHtml(eq.logo_url || '')}')" title="Editar equipo">
-                <i class="bi bi-pencil"></i> Editar
+                <i class="bi bi-pencil"></i>
               </button>
               <button class="btn btn-outline-danger" onclick="eliminarEquipo(${eq.id}, '${escapeHtml(eq.nombre)}')" title="Eliminar equipo">
                 <i class="bi bi-trash"></i>

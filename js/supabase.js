@@ -3,6 +3,7 @@
  * Sistema de Tabla de Posiciones de Fútbol
  * Archivo: js/supabase.js
  * Descripción: Configuración del cliente Supabase y Capa de Datos Unificada
+ * Incluye soporte para: Equipos, Partidos, Jugadores, Goles y Autenticación
  * ===================================================
  */
 
@@ -33,7 +34,6 @@ if (isSupabaseConfigured()) {
 window.db = supabaseClient;
 
 // 3. API Unificada para Vistas Públicas y Panel Administrador
-// Si Supabase está configurado, consulta la nube; de lo contrario, opera en LocalStorage.
 const api = {
   isCloud: isSupabaseConfigured,
 
@@ -45,7 +45,6 @@ const api = {
         if (error) throw error;
         return data.user;
       } else {
-        // Fallback local para pruebas y desarrollo
         if (email === 'admin@torneo.com' && password === 'admin123') {
           const fakeUser = { email: 'admin@torneo.com', role: 'admin', id: 'local-admin-1' };
           localStorage.setItem('torneo_admin_session', JSON.stringify(fakeUser));
@@ -85,6 +84,15 @@ const api = {
       return window.storageManager.getEquipos();
     },
 
+    async getById(id) {
+      if (isSupabaseConfigured()) {
+        const { data, error } = await supabaseClient.from('equipos').select('*').eq('id', id).single();
+        if (error) throw error;
+        return data;
+      }
+      return window.storageManager.getEquipoById(id);
+    },
+
     async create(nombre, logo_url) {
       if (isSupabaseConfigured()) {
         const { data, error } = await supabaseClient.from('equipos').insert([{ nombre, logo_url }]).select().single();
@@ -110,6 +118,59 @@ const api = {
         return true;
       }
       window.storageManager.deleteEquipo(id);
+      return true;
+    }
+  },
+
+  // --- JUGADORES ---
+  jugadores: {
+    async getAll(equipo_id = null) {
+      if (isSupabaseConfigured()) {
+        let query = supabaseClient.from('jugadores').select('*, equipos(nombre, logo_url)').order('numero', { ascending: true });
+        if (equipo_id !== null && equipo_id !== undefined && equipo_id !== '' && equipo_id !== 'todos') {
+          query = query.eq('equipo_id', equipo_id);
+        }
+        const { data, error } = await query;
+        if (error) throw error;
+        return data;
+      }
+      return window.storageManager.getJugadores(equipo_id);
+    },
+
+    async getById(id) {
+      if (isSupabaseConfigured()) {
+        const { data, error } = await supabaseClient.from('jugadores').select('*').eq('id', id).single();
+        if (error) throw error;
+        return data;
+      }
+      return window.storageManager.getJugadorById(id);
+    },
+
+    async create(jugador) {
+      if (isSupabaseConfigured()) {
+        const { data, error } = await supabaseClient.from('jugadores').insert([jugador]).select().single();
+        if (error) throw error;
+        return data;
+      }
+      return window.storageManager.addJugador(jugador);
+    },
+
+    async update(id, datos) {
+      if (isSupabaseConfigured()) {
+        const { data, error } = await supabaseClient.from('jugadores').update(datos).eq('id', id).select().single();
+        if (error) throw error;
+        return data;
+      }
+      return window.storageManager.updateJugador(id, datos);
+    },
+
+    async delete(id) {
+      if (isSupabaseConfigured()) {
+        const { error } = await supabaseClient.from('jugadores').delete().eq('id', id);
+        if (error) throw error;
+        return true;
+      }
+      window.storageManager.deleteJugador(id);
       return true;
     }
   },
@@ -154,6 +215,92 @@ const api = {
     }
   },
 
+  // --- GOLES ---
+  goles: {
+    async getByPartido(partido_id) {
+      if (isSupabaseConfigured()) {
+        const { data, error } = await supabaseClient.from('goles').select('*').eq('partido_id', partido_id);
+        if (error) throw error;
+        return data;
+      }
+      return window.storageManager.getGoles(partido_id);
+    },
+
+    async setPartidoGoles(partido_id, listaGoles) {
+      if (isSupabaseConfigured()) {
+        // Eliminar goles previos de este partido
+        await supabaseClient.from('goles').delete().eq('partido_id', partido_id);
+
+        if (listaGoles.length > 0) {
+          const insertData = listaGoles.map(g => ({
+            partido_id: Number(partido_id),
+            jugador_id: Number(g.jugador_id),
+            equipo_id: Number(g.equipo_id),
+            minuto: g.minuto ? Number(g.minuto) : null
+          }));
+          const { data, error } = await supabaseClient.from('goles').insert(insertData).select();
+          if (error) throw error;
+          return data;
+        }
+        return [];
+      }
+      return window.storageManager.setGolesPartido(partido_id, listaGoles);
+    },
+
+    async getTablaGoleadores() {
+      if (isSupabaseConfigured()) {
+        // Obtenemos jugadores, goles, equipos y partidos para calcular el ranking
+        const { data: jugadores } = await supabaseClient.from('jugadores').select('*');
+        const { data: goles } = await supabaseClient.from('goles').select('*');
+        const { data: equipos } = await supabaseClient.from('equipos').select('*');
+        const { data: partidos } = await supabaseClient.from('partidos').select('*');
+
+        const mapaGoles = {};
+        (goles || []).forEach(g => {
+          mapaGoles[g.jugador_id] = (mapaGoles[g.jugador_id] || 0) + 1;
+        });
+
+        const lista = (jugadores || []).map(j => {
+          const eq = (equipos || []).find(e => String(e.id) === String(j.equipo_id)) || { nombre: 'Sin Club', logo_url: '🛡️' };
+          const totalGoles = mapaGoles[j.id] || 0;
+          const partidosEquipo = (partidos || []).filter(p => 
+            p.estado === 'finalizado' && (String(p.local_id || p.equipo_local_id) === String(j.equipo_id) || String(p.visitante_id || p.equipo_visitante_id) === String(j.equipo_id))
+          ).length;
+
+          const promedio = partidosEquipo > 0 ? (totalGoles / partidosEquipo).toFixed(2) : '0.00';
+
+          return {
+            id: j.id,
+            nombre: j.nombre,
+            numero: j.numero,
+            posicion: j.posicion,
+            foto_url: j.foto_url,
+            equipo_id: j.equipo_id,
+            equipo_nombre: eq.nombre,
+            equipo_logo: eq.logo_url,
+            goles: totalGoles,
+            partidos_jugados: partidosEquipo,
+            promedio: promedio
+          };
+        });
+
+        lista.sort((a, b) => {
+          if (b.goles !== a.goles) return b.goles - a.goles;
+          return a.nombre.localeCompare(b.nombre);
+        });
+
+        return lista;
+      }
+      return window.storageManager.calcularTablaGoleadores();
+    },
+
+    async getPichichi() {
+      const tabla = await api.goles.getTablaGoleadores();
+      if (!tabla || tabla.length === 0 || tabla[0].goles === 0) return null;
+      return tabla[0];
+    }
+  },
+
   // --- CÁLCULO DE POSICIONES ---
   posiciones: {
     async calcular() {
@@ -180,8 +327,10 @@ const api = {
       partidos.forEach(p => {
         if (p.estado !== 'finalizado') return;
 
-        const loc = tabla[p.local_id || p.equipo_local_id];
-        const vis = tabla[p.visitante_id || p.equipo_visitante_id];
+        const locId = p.local_id || p.equipo_local_id;
+        const visId = p.visitante_id || p.equipo_visitante_id;
+        const loc = tabla[locId];
+        const vis = tabla[visId];
         if (!loc || !vis) return;
 
         const gl = Number(p.goles_local);
