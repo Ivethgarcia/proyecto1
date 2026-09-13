@@ -301,6 +301,16 @@ const api = {
     }
   },
 
+  // Alias conveniente para goleadores
+  goleadores: {
+    async getTabla() {
+      return api.goles.getTablaGoleadores();
+    },
+    async getPichichi() {
+      return api.goles.getPichichi();
+    }
+  },
+
   // --- CÁLCULO DE POSICIONES ---
   posiciones: {
     async calcular() {
@@ -357,6 +367,39 @@ const api = {
           vis.pe += 1;
           vis.pts += 1;
         }
+      });
+
+      // Calcular historial de formas (últimos 5 partidos terminados)
+      const partidosFinalizados = partidos
+        .filter(p => p.estado === 'finalizado')
+        .sort((a, b) => {
+          if (a.jornada !== b.jornada) return a.jornada - b.jornada;
+          return new Date(a.fecha) - new Date(b.fecha);
+        });
+
+      equipos.forEach(eq => {
+        const eqId = String(eq.id);
+        const historial = [];
+        partidosFinalizados.forEach(p => {
+          const locId = String(p.local_id || p.equipo_local_id);
+          const visId = String(p.visitante_id || p.equipo_visitante_id);
+          const esLocal = locId === eqId;
+          const esVis = visId === eqId;
+          if (!esLocal && !esVis) return;
+
+          const gl = Number(p.goles_local);
+          const gv = Number(p.goles_visitante);
+
+          if (gl === gv) {
+            historial.push({ resultado: 'E', detalle: `Empate ${gl}-${gv}` });
+          } else if ((esLocal && gl > gv) || (esVis && gv > gl)) {
+            historial.push({ resultado: 'V', detalle: `Victoria ${esLocal ? gl : gv}-${esLocal ? gv : gl}` });
+          } else {
+            historial.push({ resultado: 'D', detalle: `Derrota ${esLocal ? gl : gv}-${esLocal ? gv : gl}` });
+          }
+        });
+
+        tabla[eq.id].racha = historial.slice(-5);
       });
 
       const resultado = Object.values(tabla).map(item => {

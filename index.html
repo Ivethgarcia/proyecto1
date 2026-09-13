@@ -151,14 +151,22 @@
     </section>
 
     <!-- Tarjeta Principal con la Tabla de Posiciones -->
-    <div class="standings-card">
-      <div class="standings-card-header">
-        <h2 class="standings-card-title">
+    <div class="standings-card" id="tabla-posiciones-card">
+      <div class="standings-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <h2 class="standings-card-title m-0">
           <i class="bi bi-list-ol text-primary"></i> Tabla General
         </h2>
-        <span class="badge bg-light text-secondary border px-3 py-2">
-          <i class="bi bi-arrow-repeat me-1"></i> Actualizado en vivo
-        </span>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <button id="btn-exportar-pdf" class="btn btn-outline-danger btn-sm px-3 fw-medium" onclick="exportarTablaPDF()">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Exportar PDF
+          </button>
+          <button class="btn btn-outline-secondary btn-sm px-2" onclick="imprimirReporte()" title="Imprimir reporte">
+            <i class="bi bi-printer-fill"></i>
+          </button>
+          <span class="badge bg-light text-secondary border px-3 py-2">
+            <i class="bi bi-arrow-repeat me-1"></i> Actualizado en vivo
+          </span>
+        </div>
       </div>
 
       <!-- Contenedor con scroll responsivo -->
@@ -176,6 +184,7 @@
               <th scope="col" title="Goles en Contra">GC</th>
               <th scope="col" title="Diferencia de Goles">DG</th>
               <th scope="col" class="col-points" title="Puntos Totales">PTS</th>
+              <th scope="col" class="text-center col-forma" style="width: 140px;" title="Últimos 5 partidos (Más reciente a la derecha)">Forma</th>
             </tr>
           </thead>
           <tbody id="tabla-posiciones-body">
@@ -199,6 +208,15 @@
               <td>8</td>
               <td class="dg-positive">+16</td>
               <td class="col-points">25</td>
+              <td class="text-center">
+                <div class="forma-container">
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                </div>
+              </td>
             </tr>
 
             <!-- Fila 2: Zona de Clasificación -->
@@ -220,6 +238,15 @@
               <td>10</td>
               <td class="dg-positive">+12</td>
               <td class="col-points">23</td>
+              <td class="text-center">
+                <div class="forma-container">
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                </div>
+              </td>
             </tr>
 
             <!-- Fila 3: Zona de Clasificación -->
@@ -241,6 +268,15 @@
               <td>9</td>
               <td class="dg-positive">+9</td>
               <td class="col-points">20</td>
+              <td class="text-center">
+                <div class="forma-container">
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                </div>
+              </td>
             </tr>
 
             <!-- Fila 4: Zona de Clasificación -->
@@ -262,6 +298,15 @@
               <td>11</td>
               <td class="dg-positive">+4</td>
               <td class="col-points">18</td>
+              <td class="text-center">
+                <div class="forma-container">
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                </div>
+              </td>
             </tr>
 
             <!-- Fila 5: Zona Media (Neutral) -->
@@ -283,6 +328,15 @@
               <td>13</td>
               <td class="dg-positive">+1</td>
               <td class="col-points">15</td>
+              <td class="text-center">
+                <div class="forma-container">
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                </div>
+              </td>
             </tr>
 
             <!-- Fila 6: Zona Media (Neutral) -->
@@ -304,6 +358,15 @@
               <td>15</td>
               <td class="dg-negative">-3</td>
               <td class="col-points">12</td>
+              <td class="text-center">
+                <div class="forma-container">
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                </div>
+              </td>
             </tr>
 
             <!-- Fila 7: Zona de Descenso (Rojo) -->
@@ -325,6 +388,15 @@
               <td>19</td>
               <td class="dg-negative">-11</td>
               <td class="col-points">6</td>
+              <td class="text-center">
+                <div class="forma-container">
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                  <span class="forma-badge forma-v" title="Victoria">V</span>
+                </div>
+              </td>
             </tr>
 
             <!-- Fila 8: Zona de Descenso (Rojo) -->
@@ -346,6 +418,15 @@
               <td>23</td>
               <td class="dg-negative">-17</td>
               <td class="col-points">3</td>
+              <td class="text-center">
+                <div class="forma-container">
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                  <span class="forma-badge forma-d" title="Derrota">D</span>
+                  <span class="forma-badge forma-e" title="Empate">E</span>
+                </div>
+              </td>
             </tr>
 
           </tbody>
@@ -355,9 +436,9 @@
 
     <!-- Leyenda de colores de distinción -->
     <div class="legend-card">
-      <div class="d-flex align-items-center justify-content-start flex-wrap gap-4">
+      <div class="d-flex align-items-center justify-content-start flex-wrap gap-4 mb-3">
         <div class="fw-bold small text-muted text-uppercase">
-          <i class="bi bi-info-circle me-1"></i> Referencias:
+          <i class="bi bi-info-circle me-1"></i> Posiciones:
         </div>
         <div class="legend-item">
           <span class="legend-color-indicator indicator-champions"></span>
@@ -370,6 +451,26 @@
         <div class="legend-item">
           <span class="legend-color-indicator indicator-relegation"></span>
           <span>Zona de Descenso (7º - 8º)</span>
+        </div>
+      </div>
+      <div class="d-flex align-items-center justify-content-start flex-wrap gap-3 pt-2 border-top">
+        <div class="fw-bold small text-muted text-uppercase">
+          <i class="bi bi-clock-history me-1"></i> Forma (Últimos 5 partidos):
+        </div>
+        <div class="legend-item d-flex align-items-center gap-1">
+          <span class="forma-badge forma-v" style="width: 20px; height: 20px; font-size: 0.65rem;">V</span>
+          <span>Victoria</span>
+        </div>
+        <div class="legend-item d-flex align-items-center gap-1">
+          <span class="forma-badge forma-e" style="width: 20px; height: 20px; font-size: 0.65rem;">E</span>
+          <span>Empate</span>
+        </div>
+        <div class="legend-item d-flex align-items-center gap-1">
+          <span class="forma-badge forma-d" style="width: 20px; height: 20px; font-size: 0.65rem;">D</span>
+          <span>Derrota</span>
+        </div>
+        <div class="small text-muted ms-auto fst-italic">
+          * Orden cronológico: el más reciente a la derecha
         </div>
       </div>
     </div>
@@ -391,10 +492,14 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <!-- Supabase JS Client v2 CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- html2pdf.js CDN para generación y descarga directa de PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <!-- Configuración de Supabase -->
   <script src="js/supabase.js"></script>
   <!-- Almacenamiento Local (LocalStorage) -->
   <script src="js/storage.js"></script>
+  <!-- Generación de reportes y exportación PDF -->
+  <script src="js/reportes.js"></script>
   <!-- Lógica de Tabla de Posiciones -->
   <script src="js/posiciones.js"></script>
 </body>

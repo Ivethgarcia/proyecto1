@@ -75,6 +75,14 @@ async function renderizarTablaPosiciones() {
         ? `<img src="${eq.logo_url}" alt="${eq.nombre}" style="width: 22px; height: 22px; object-fit: contain;">`
         : `<span>${eq.logo_url || '🛡️'}</span>`;
 
+      // Generar badges de racha (últimos 5 partidos)
+      const rachaBadges = (eq.racha && eq.racha.length > 0)
+        ? eq.racha.map(r => {
+            const cls = r.resultado === 'V' ? 'forma-v' : (r.resultado === 'E' ? 'forma-e' : 'forma-d');
+            return `<span class="forma-badge ${cls}" title="${r.detalle || r.resultado}">${r.resultado}</span>`;
+          }).join('')
+        : '<span class="text-muted small">-</span>';
+
       return `
         <tr class="${rowClass}">
           <td>
@@ -94,6 +102,9 @@ async function renderizarTablaPosiciones() {
           <td>${eq.gc}</td>
           <td class="${dgClass}">${dgTexto}</td>
           <td class="col-points">${eq.pts}</td>
+          <td class="text-center">
+            <div class="forma-container">${rachaBadges}</div>
+          </td>
         </tr>
       `;
     }).join('');

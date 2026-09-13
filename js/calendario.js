@@ -26,19 +26,84 @@ async function inicializarCalendarioPublico() {
 }
 
 /**
- * Configura los selectores de filtrado por jornada y estado
+ * Configura los selectores de filtrado por jornada y estado, así como las pills interactivas
  */
 function configurarFiltros() {
   const selectJornada = document.getElementById('filtro-jornada');
   const selectEstado = document.getElementById('filtro-estado');
+  const pillsContenedor = document.getElementById('pills-jornadas');
+  const resumenBadge = document.getElementById('resumen-jornada-badge');
 
   if (!selectJornada) return;
 
-  // Obtener jornadas únicas
-  const jornadas = [...new Set(todosLosPartidos.map(p => p.jornada))].sort((a, b) => a - b);
+  // Obtener jornadas únicas ordenadas
+  const jornadas = [...new Set(todosLosPartidos.map(p => Number(p.jornada) || 1))].sort((a, b) => a - b);
   
+  // Rellenar select
   selectJornada.innerHTML = `<option value="todas">Todas las Jornadas</option>` +
     jornadas.map(j => `<option value="${j}">Jornada ${j}</option>`).join('');
+
+  // Rellenar pills interactivas si existe el contenedor
+  if (pillsContenedor) {
+    let pillsHtml = `
+      <button type="button" class="btn btn-sm btn-primary pill-jornada-btn px-3 py-1 fw-medium" data-jornada="todas">
+        Todas
+      </button>
+    `;
+    jornadas.forEach(j => {
+      pillsHtml += `
+        <button type="button" class="btn btn-sm btn-outline-secondary pill-jornada-btn px-2 py-1 fw-medium" data-jornada="${j}">
+          J${j}
+        </button>
+      `;
+    });
+    pillsContenedor.innerHTML = pillsHtml;
+
+    // Eventos de click en las pills
+    pillsContenedor.querySelectorAll('.pill-jornada-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = btn.getAttribute('data-jornada');
+        selectJornada.value = val;
+        actualizarEstadoPills(val);
+        aplicarFiltro();
+      });
+    });
+  }
+
+  function actualizarEstadoPills(jornadaActiva) {
+    if (!pillsContenedor) return;
+    pillsContenedor.querySelectorAll('.pill-jornada-btn').forEach(btn => {
+      if (btn.getAttribute('data-jornada') === String(jornadaActiva)) {
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('btn-primary');
+      } else {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline-secondary');
+      }
+    });
+  }
+
+  function actualizarResumen(filtrados, jornadaSel) {
+    if (!resumenBadge) return;
+    const finalizados = filtrados.filter(p => p.estado === 'finalizado');
+    const goles = finalizados.reduce((acc, p) => acc + Number(p.goles_local || 0) + Number(p.goles_visitante || 0), 0);
+
+    if (jornadaSel === 'todas') {
+      resumenBadge.innerHTML = `
+        <i class="bi bi-info-circle me-1 text-primary"></i>
+        <span>${filtrados.length} partidos</span> • 
+        <span class="text-success fw-semibold">${finalizados.length} jugados</span> • 
+        <span class="text-dark fw-bold">${goles} goles en total</span>
+      `;
+    } else {
+      resumenBadge.innerHTML = `
+        <i class="bi bi-calendar2-check me-1 text-primary"></i>
+        <span>Jornada ${jornadaSel}:</span> 
+        <strong class="text-dark">${filtrados.length} partidos</strong> • 
+        <span class="text-success fw-semibold">${goles} goles</span>
+      `;
+    }
+  }
 
   const aplicarFiltro = () => {
     const jornadaSeleccionada = selectJornada.value;
@@ -54,13 +119,21 @@ function configurarFiltros() {
       filtrados = filtrados.filter(p => p.estado === estadoSeleccionado);
     }
 
+    actualizarResumen(filtrados, jornadaSeleccionada);
     renderizarPartidosPublicos(filtrados);
   };
 
-  selectJornada.addEventListener('change', aplicarFiltro);
+  selectJornada.addEventListener('change', () => {
+    actualizarEstadoPills(selectJornada.value);
+    aplicarFiltro();
+  });
+
   if (selectEstado) {
     selectEstado.addEventListener('change', aplicarFiltro);
   }
+
+  // Inicializar resumen
+  actualizarResumen(todosLosPartidos, 'todas');
 }
 
 /**

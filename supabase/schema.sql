@@ -48,6 +48,13 @@ CREATE TABLE IF NOT EXISTS goles (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Índices de Rendimiento para Consultas de Jornadas, Racha y Goleadores
+CREATE INDEX IF NOT EXISTS idx_partidos_jornada ON partidos(jornada);
+CREATE INDEX IF NOT EXISTS idx_partidos_equipos ON partidos(equipo_local_id, equipo_visitante_id);
+CREATE INDEX IF NOT EXISTS idx_goles_jugador ON goles(jugador_id);
+CREATE INDEX IF NOT EXISTS idx_goles_partido ON goles(partido_id);
+CREATE INDEX IF NOT EXISTS idx_jugadores_equipo ON jugadores(equipo_id);
+
 -- 5. Habilitar Seguridad a Nivel de Fila (RLS)
 ALTER TABLE equipos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE jugadores ENABLE ROW LEVEL SECURITY;

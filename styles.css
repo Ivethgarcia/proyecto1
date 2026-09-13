@@ -585,3 +585,112 @@ footer {
   box-shadow: 0 2px 6px rgba(251, 146, 60, 0.5);
 }
 
+/* ===================================================
+   Historial de Formas (Racha - Últimos 5 partidos)
+   =================================================== */
+.forma-container {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+
+.forma-badge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  cursor: default;
+  transition: transform 0.15s ease;
+}
+
+.forma-badge:hover {
+  transform: scale(1.18);
+}
+
+.forma-v {
+  background-color: #10b981; /* Victoria - Verde */
+}
+
+.forma-e {
+  background-color: #64748b; /* Empate - Gris */
+}
+
+.forma-d {
+  background-color: #ef4444; /* Derrota - Rojo */
+}
+
+.forma-vacia {
+  background-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+/* ===================================================
+   Estilos para Impresión y Reportes PDF
+   =================================================== */
+@media print {
+  nav, footer, .btn, .badge-season, .no-print,
+  .standings-card-header .btn, .legend-card {
+    display: none !important;
+  }
+
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 10pt;
+  }
+
+  .container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .league-header {
+    background: #1e3a8a !important;
+    color: #ffffff !important;
+    padding: 1rem !important;
+    margin-bottom: 1rem !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .standings-card {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+
+  .table-standings {
+    width: 100% !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .table-standings thead {
+    background-color: #0f172a !important;
+    color: #ffffff !important;
+  }
+
+  .row-champions {
+    background-color: #f0fdf4 !important;
+    border-left: 4px solid #10b981 !important;
+  }
+
+  .row-relegation {
+    background-color: #fef2f2 !important;
+    border-left: 4px solid #ef4444 !important;
+  }
+
+  .forma-v { background-color: #10b981 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .forma-e { background-color: #64748b !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .forma-d { background-color: #ef4444 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+
